@@ -19,8 +19,11 @@ class DuckPollCog(commands.Cog):
         self.config.register_global(**self.DEFAULT_SETTINGS)
         self.cleanup_messages.start()
 
+    # Events
+
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user: Union[discord.User, discord.Member]):
+        """Enforces 1 reaction per user on duck polls"""
         if user.bot or not reaction.message.guild:
             # User is bot or message not in guild
             return
@@ -72,14 +75,18 @@ class DuckPollCog(commands.Cog):
             else:
                 messages.remove(stored_message)
 
+    # Tasks
+
     @tasks.loop(seconds=60)  # Every minute
     async def cleanup_messages(self):
         """Removes all messages from the database if they're older than 24 hours"""
         async with self.config.messages() as messages:
             [
-                (self.bot.create_task(self.cleanup_message(m)), messages.remove(m))
+                (self.bot.create_task(self.send_stats(m)), messages.remove(m))
                 for m in filter(lambda m: m["created_at"] < (time.time() - (60 * 60 * 24)), messages)
             ]
+
+    # Command groups
 
     @commands.group("duck", invoke_without_command=True)
     async def duck(self, ctx: commands.Context):
@@ -90,6 +97,8 @@ class DuckPollCog(commands.Cog):
         message = await ctx.send("On a rubber duck scale, how's your day going?", file=await self.get_duck_image())
         for emoji in self.EMOJIS:
             await message.add_reaction(emoji)
+
+    # Commands
 
     @duck.command("stats")
     async def duck_stats(self, ctx):
@@ -110,10 +119,13 @@ class DuckPollCog(commands.Cog):
             else:
                 stats = await self.get_stats(message)
                 ctx = await self.bot.get_context(message)
-                embed = await self.make_stats_embed(ctx, stats)
+                embed = await self.make_stats_embed(ctx, stats, poll)
                 await ctx.send(embed=embed)
 
-    async def cleanup_message(self, message: dict):
+    # Utility methods
+
+    async def send_stats(self, message: dict, return_error: bool = False):
+        """Send stats to channel"""
         guild = self.bot.get_guild(message["guild_id"])
         if not guild:
             # Couldn't find guild
@@ -128,11 +140,12 @@ class DuckPollCog(commands.Cog):
             message = await channel.fetch_message(message["message_id"])
         except (discord.NotFound, discord.Forbidden, discord.HTTPException):
             # Couldn't find message
-            return
+            if return_error:
+                await channel.send("No existing duck polls for this channel found")
         else:
             ctx = await self.bot.get_context(message)
             stats = await self.get_stats(message)
-            embed = await self.make_stats_embed(ctx, stats)
+            embed = await self.make_stats_embed(ctx, stats, message)
             await channel.send(embed=embed)
 
     async def get_duck_image(self) -> discord.File:
@@ -147,10 +160,14 @@ class DuckPollCog(commands.Cog):
         reactions = {str(r.emoji): r.count - 1 for r in message.reactions if str(r.emoji) in self.EMOJIS}
         return {emoji: reactions.get(emoji, 0) for emoji in self.EMOJIS}
 
-    async def make_stats_embed(self, ctx: commands.Context, stats: Mapping[str, int]) -> discord.Embed:
+    async def make_stats_embed(self, ctx: commands.Context, stats: Mapping[str, int], data: dict) -> discord.Embed:
         """Generate embed for duck poll stats"""
         sum_of_votes = sum(stats.values())
-        embed = discord.Embed(title="Duck poll stats", colour=await ctx.embed_colour())
+        embed = discord.Embed(
+            title="Duck poll stats",
+            colour=await ctx.embed_colour(),
+            description=f"[Jump to message](https://discord.com/channels/{data['guild_id']}/{data['channel_id']}/{data['message_id']})"
+        )
         list(
             map(
                 lambda v: embed.add_field(

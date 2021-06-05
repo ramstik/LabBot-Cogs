@@ -1,4 +1,4 @@
-from .duckpoll import DuckCog
+from .duckpoll import DuckPollCog
 
 
 def setup(bot):
