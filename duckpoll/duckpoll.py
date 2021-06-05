@@ -98,6 +98,14 @@ class DuckPollCog(commands.Cog):
         for emoji in self.EMOJIS:
             await message.add_reaction(emoji)
 
+        async with self.config.messages() as messages:
+            messages.append({
+                "guild_id": message.guild.id,
+                "channel_id": message.channel.id,
+                "message_id": message.id,
+                "created_at": message.created_at.timestamp()
+            })
+
     # Commands
 
     @duck.command("stats")
