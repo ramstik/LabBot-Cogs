@@ -1,0 +1,5 @@
+from .duckpoll import DuckCog
+
+
+def setup(bot):
+    bot.add_cog(DuckPollCog(bot))
