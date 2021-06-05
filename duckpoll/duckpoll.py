@@ -33,11 +33,11 @@ class DuckPollCog(commands.Cog):
         async with self.config.messages() as messages:
             if not list(
                 filter(
-                    lambda m: all(
+                    lambda m: all((
                         (m["guild_id"] == message.guild.id),
                         (m["channel_id"] == message.channel.id),
                         (m["message_id"] == message.id),
-                    ),
+                    )),
                     messages,
                 )
             ):
@@ -64,9 +64,11 @@ class DuckPollCog(commands.Cog):
         async with self.config.messages() as messages:
             try:
                 (stored_message,) = filter(
-                    lambda m: all(
-                        m["guild_id"] == message.guild.id, m["channel_id"] == message.channel.id, m["message_id"] == message.id
-                    ),
+                    lambda m: all((
+                        m["guild_id"] == message.guild.id,
+                        m["channel_id"] == message.channel.id,
+                        m["message_id"] == message.id
+                    )),
                     messages,
                 )
             except ValueError:
@@ -113,7 +115,7 @@ class DuckPollCog(commands.Cog):
         """See the stats of the last duck poll in this channel"""
         async with self.config.messages() as messages:
             channel_duck_polls = sorted(
-                filter(lambda m: all(m["guild_id"] == ctx.guild.id, m["channel_id"] == ctx.channel.id), messages),
+                filter(lambda m: all((m["guild_id"] == ctx.guild.id, m["channel_id"] == ctx.channel.id)), messages),
                 key=lambda m: m["created_at"],
             )
             if not channel_duck_polls:
