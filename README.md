@@ -22,6 +22,7 @@ Cogs for the [RED](https://github.com/Cog-Creators/Red-DiscordBot/)-based [Homel
   - [Google](#google)
   - [LaTeX](#latex)
   - [Letters](#letters)
+  - [Naughty](#naughty)
   - [Notes](#notes)
   - [Penis](#penis)
   - [Purge](#purge)
@@ -47,6 +48,7 @@ A massive thank you to all who've helped out with this project ❤️
 - [tigattack](https://github.com/tigattack)
 - [Issy](https://github.issy.dev)
 - [portalBlock](https://github.com/portalBlock)
+- [Ramstik](https://github.com/ramstik)
 
 ### Other
 
@@ -66,6 +68,7 @@ A massive thank you to all who've helped out with this project ❤️
 - **[Google](#google):** Send a google link to someone.
 - **[LaTeX](#latex):** Render a LaTeX statement.
 - **[Letters](#letters):** Outputs large emote letters/numbers from input text.
+- **[Naughty](#naughty):** Performs Naughty role management on users.
 - **[Notes](#notes):** Manage notes and warnings against users.
 - **[Penis](#penis):** Allows users to check the size of their penis.
 - **[Purge](#purge):** This will purge users based on criteria.
@@ -179,6 +182,16 @@ It is possible to add notes to a user who has left or not yet joined. Notes are 
 Deleting a note does not actually delete the note. It simply marks it in the datastore as deleted and does not show it in normal use. This can allow future recovery of notes (using the `restore` subcommand) if a bad party is attempting to wipe existing notes.
 
 Notes and warnings can be edited using the `edit` subcommand.
+
+### Naughty
+
+`[p]naughty` : Apply Naughty status  
+`[p]unaughty` : Revoke Naughty status
+
+The Naughty cog is built to automatically manage the Naughty role for problematic users.  
+The principle is that a Naught{y,ied} user should not be allowed to see or interact with any channel aside from the designated discussion channel.  
+
+The cog, when activated, shall evaluate the roles of a user, determine if any opt-ins are present, make note of which are present, and then remove the opt-in roles. It will then apply the Naughty role, which places the user into the designated Naughty state for Moderators to pursue action.
 
 ### Penis
 

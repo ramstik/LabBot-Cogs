@@ -1,0 +1,13 @@
+{
+    "author": [
+        "Ramstik"
+    ],
+    "short": "Naughty cog",
+    "description": "Allows Moderators to Naughty an individual quickly. Removes any opt-in roles temporarily.",
+    "disabled": false,
+    "name": "naughty",
+    "tags": [
+        "naughty"
+    ],
+    "install_msg": "Usage: `[p]naughty` to apply. `[p]unaughty` to remove."
+}
